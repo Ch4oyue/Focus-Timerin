@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tentang - Focus Timerin</title>
+  <meta name="description" content="Pelajari alasan dibalik dibuatnya Focus Timerin.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../assets/images/pomodoro.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <script type="module" src="../assets/js/static-page.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar surface" aria-label="Navigasi utama">
+      <div class="navbar__brand">
+        <img src="../assets/images/pomodoro.png" alt="Logo Focus Timerin">
+        <span>Focus Timerin</span>
+      </div>
+      <button class="icon-button navbar__toggle" data-menu-toggle aria-expanded="false" aria-label="Buka menu">☰</button>
+      <ul class="navbar__links" data-nav-links>
+        <li><a class="navbar__link" href="../index.html">Beranda</a></li>
+        <li><a class="navbar__link" href="history.html">Riwayat</a></li>
+        <li><a class="navbar__link" href="settings.html">Pengaturan</a></li>
+        <li><a class="navbar__link" href="about.html">Tentang</a></li>
+        <li><a class="navbar__link" href="profile.html">Profil</a></li>
+      </ul>
+      <div class="navbar__actions">
+        <button class="icon-button" data-theme-toggle aria-label="Ganti tema">☾</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main-wrapper">
+    <section class="surface page-card">
+      <h1 class="page-title">Tentang Focus Timerin</h1>
+      <p class="page-subtitle">Aplikasi ini dibuat untuk membantu para pelajar, pekerja kreatif, dan siapa pun yang ingin melatih fokus dengan ritme kerja yang seimbang.</p>
+
+      <article class="surface-alt page-card">
+        <h2>Kenapa kami membuatnya?</h2>
+        <p>Focus Timerin lahir dari kebutuhan sederhana: menemukan alat Pomodoro yang tidak hanya menghitung waktu, tetapi juga membantu mencatat tugas dan progres. Kami menggabungkan teknik klasik Pomodoro dengan fitur modern seperti daftar tugas, penyimpanan otomatis, dan tema adaptif agar kamu bisa fokus tanpa banyak pengaturan.</p>
+      </article>
+
+      <article class="surface-alt page-card">
+        <h2>Fitur utama</h2>
+        <ul>
+          <li>Mode fokus dan istirahat yang dapat diatur.</li>
+          <li>Daftar tugas yang terhubung langsung dengan timer.</li>
+          <li>Riwayat sesi untuk mengevaluasi progres harian atau mingguan.</li>
+          <li>Pengaturan tema dan volume yang disimpan otomatis di perangkatmu.</li>
+        </ul>
+      </article>
+
+      <article class="surface-alt page-card">
+        <h2>Bagaimana kami menyimpan data?</h2>
+        <p>Semua data disimpan secara lokal di perambanmu menggunakan <em>localStorage</em>. Artinya, informasi tugas, pengaturan, dan riwayat hanya tersedia di perangkat yang kamu gunakan saat ini.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">© <span id="year"></span> Focus Timerin.</footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

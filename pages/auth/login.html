@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masuk - Focus Timerin</title>
+  <meta name="description" content="Masuk ke Focus Timerin dan lanjutkan progres produktifmu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../../assets/images/pomodoro.png" type="image/png">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/auth.css">
+  <script type="module" src="../../assets/js/auth.js" defer></script>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <header class="auth-card__header">
+      <h1>Masuk</h1>
+      <p>Simpan emailmu agar data tersinkron di perangkat ini.</p>
+    </header>
+
+    <form class="auth-form" data-auth-form autocomplete="off">
+      <div class="form-control">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="nama@contoh.com" required>
+      </div>
+      <div class="form-control">
+        <label for="password">Kata sandi</label>
+        <input type="password" id="password" name="password" placeholder="••••••" required>
+      </div>
+      <button class="btn btn-primary" type="submit">Simpan &amp; Masuk</button>
+    </form>
+
+    <p class="auth-footer">Belum punya akun? <a href="register.html">Daftar sekarang</a></p>
+  </main>
+</body>
+</html>

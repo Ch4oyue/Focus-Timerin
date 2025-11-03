@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riwayat Fokus - Focus Timerin</title>
+  <meta name="description" content="Lihat riwayat sesi fokus dan istirahatmu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../assets/images/pomodoro.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+  <script type="module" src="../assets/js/history.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar surface" aria-label="Navigasi utama">
+      <div class="navbar__brand">
+        <img src="../assets/images/pomodoro.png" alt="Logo Focus Timerin">
+        <span>Focus Timerin</span>
+      </div>
+      <button class="icon-button navbar__toggle" data-menu-toggle aria-expanded="false" aria-label="Buka menu">☰</button>
+      <ul class="navbar__links" data-nav-links>
+        <li><a class="navbar__link" href="../index.html">Beranda</a></li>
+        <li><a class="navbar__link" href="history.html">Riwayat</a></li>
+        <li><a class="navbar__link" href="settings.html">Pengaturan</a></li>
+        <li><a class="navbar__link" href="about.html">Tentang</a></li>
+        <li><a class="navbar__link" href="profile.html">Profil</a></li>
+      </ul>
+      <div class="navbar__actions">
+        <button class="icon-button" data-theme-toggle aria-label="Ganti tema">☾</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main-wrapper">
+    <header class="page-section">
+      <h1 class="page-title">Riwayat fokus</h1>
+      <p class="page-subtitle">Pantau sesi yang sudah kamu selesaikan untuk melihat pola produktivitasmu.</p>
+      <div class="surface-alt task-summary" id="historyStats"></div>
+    </header>
+
+    <section class="surface page-card">
+      <h2>Log sesi</h2>
+      <div id="historyEmpty" class="empty-state" hidden>Belum ada sesi tercatat. Mulai satu sesi fokus untuk mengisi riwayat.</div>
+      <div id="historyList" class="history-list" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer">© <span id="year"></span> Focus Timerin.</footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
