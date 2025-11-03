@@ -38,17 +38,22 @@ updateVersion(CURRENT_VERSION, VERSION_CHANGELOG);
 
 // DOM Content Loaded - Initialize everything
 document.addEventListener('DOMContentLoaded', () => {
-  loadTimerState();
+  const hasSavedState = loadTimerState();
+  const savedSettings = JSON.parse(localStorage.getItem('focusTimerSettings')) || defaultSettings;
+
+  if (!hasSavedState) {
+    initializeTimer(savedSettings.focusDuration * 60);
+  } else if (totalSeconds <= 0) {
+    initializeTimer(savedSettings.focusDuration * 60);
+  } else {
+    updateTimerDisplay();
+  }
   // Theme Toggle
   const themeToggle = document.getElementById('themeToggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      document.body.classList.toggle('light-mode');
-      // Simpan preferensi
-      const settings = JSON.parse(localStorage.getItem('focusTimerSettings')) || defaultSettings;
-      settings.theme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
-      localStorage.setItem('focusTimerSettings', JSON.stringify(settings));
+      const newTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+      setTheme(newTheme);
     });
   }
 
@@ -277,6 +282,7 @@ function updateTimerDisplay() {
 function initializeTimer(seconds) {
   totalSeconds = seconds;
   currentSeconds = seconds;
+  isRunning = false;
   updateTimerDisplay();
   setProgress(0);
   saveTimerState();
@@ -422,11 +428,19 @@ function saveTimerState() {
 
 function loadTimerState() {
   const state = JSON.parse(localStorage.getItem('focusTimerState'));
-  if (state) {
-    currentSeconds = state.currentSeconds;
+  if (state && Number.isFinite(state.totalSeconds) && state.totalSeconds > 0) {
     totalSeconds = state.totalSeconds;
-    isRunning = state.isRunning;
-    currentMode = state.currentMode;
+    currentSeconds = Number.isFinite(state.currentSeconds) ? state.currentSeconds : state.totalSeconds;
+    currentMode = state.currentMode || 'focus';
     count = state.count || 0;
+    isRunning = false;
+    return true;
   }
+
+  totalSeconds = 0;
+  currentSeconds = 0;
+  currentMode = 'focus';
+  count = 0;
+  isRunning = false;
+  return false;
 }
