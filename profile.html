@@ -35,8 +35,6 @@
       transform: scale(0.98);
     }
   </style>
-  <!-- Load button handling after Firebase -->
-  <script src="profile-buttons.js"></script>
 </head>
 <body class="dark-mode">  <div class="profile-container">
     <div class="profile-header-actions">
@@ -97,315 +95,412 @@
       </div>
     </div>
   </div>  <!-- Firebase Integration -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
-    import { getAuth, onAuthStateChanged, updateProfile, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-storage.js";
-    
-    // Make auth globally available for button handlers
-    window.auth = null;
-    window.updateProfile = updateProfile;
-    window.sendPasswordResetEmail = sendPasswordResetEmail;
-    window.signOut = signOut;
 
-    const firebaseConfig = {      apiKey: "AIzaSyBxudMXI0S_NTcKJHpaMwkWuvjwLrXcDfA",
-      authDomain: "focus-timerin.firebaseapp.com",
-      projectId: "focus-timerin",
-      storageBucket: "focus-timerin.appspot.com",
-      messagingSenderId: "681353942231",
-      appId: "1:681353942231:web:a4eaf0e8e106370935cc92",
-      measurementId: "G-6TWY2FQXHG"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    window.storage = getStorage(app);
-    
-    // Make Firebase functions globally available
-    window.updateProfile = updateProfile;
-    window.sendPasswordResetEmail = sendPasswordResetEmail;
-    window.signOut = signOut;
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+  import { getAuth, onAuthStateChanged, updateProfile, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-storage.js";
 
-    // Get DOM Elements
-    const backBtn = document.getElementById('backBtn');
-    const versionInfoBtn = document.getElementById('versionInfoBtn');
-    const editDropdownBtn = document.getElementById('editDropdownBtn');
-    const editActions = document.getElementById('editActions');
-    const editNameBtn = document.getElementById('editNameBtn');
-    const editEmailBtn = document.getElementById('editEmailBtn');
-    const editPhotoBtn = document.getElementById('editPhotoBtn');
-    const emailSpan = document.getElementById('profileEmail');
-    const nameSpan = document.getElementById('profileName');
-    const joinedSpan = document.getElementById('profileJoined');
-    const totalFocusSpan = document.getElementById('profileTotalFocus');
-    const changePasswordBtn = document.getElementById('changePasswordBtn');
-    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const closeVersionInfo = document.getElementById('closeVersionInfo');
-    const versionInfoModal = document.getElementById('versionInfoModal');
-    const avatarInput = document.getElementById('avatarInput');
-    const profileAvatar = document.getElementById('profileAvatar');    // Initialize ImageKit    // Initialize ImageKit SDK
-    const imagekit = new ImageKit({
-      publicKey: "public_ySA/zrQV3jHz1T9KiHuJh0fggbw=",
-      urlEndpoint: "https://ik.imagekit.io/focustimerin",
-      authenticationEndpoint: "/auth/imagekit" // We'll handle this on the server side
+  const firebaseConfig = {
+    apiKey: "AIzaSyBxudMXI0S_NTcKJHpaMwkWuvjwLrXcDfA",
+    authDomain: "focus-timerin.firebaseapp.com",
+    projectId: "focus-timerin",
+    storageBucket: "focus-timerin.appspot.com",
+    messagingSenderId: "681353942231",
+    appId: "1:681353942231:web:a4eaf0e8e106370935cc92",
+    measurementId: "G-6TWY2FQXHG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const storage = getStorage(app);
+
+  window.auth = auth;
+  window.storage = storage;
+  window.updateProfile = updateProfile;
+  window.sendPasswordResetEmail = sendPasswordResetEmail;
+  window.signOut = signOut;
+
+  const elements = {
+    backBtn: document.getElementById('backBtn'),
+    versionInfoBtn: document.getElementById('versionInfoBtn'),
+    editDropdownBtn: document.getElementById('editDropdownBtn'),
+    editActions: document.getElementById('editActions'),
+    editNameBtn: document.getElementById('editNameBtn'),
+    editEmailBtn: document.getElementById('editEmailBtn'),
+    editPhotoBtn: document.getElementById('editPhotoBtn'),
+    emailSpan: document.getElementById('profileEmail'),
+    nameSpan: document.getElementById('profileName'),
+    joinedSpan: document.getElementById('profileJoined'),
+    totalFocusSpan: document.getElementById('profileTotalFocus'),
+    changePasswordBtn: document.getElementById('changePasswordBtn'),
+    toggleThemeBtn: document.getElementById('toggleThemeBtn'),
+    logoutBtn: document.getElementById('logoutBtn'),
+    loginBtn: document.getElementById('loginBtn'),
+    closeVersionInfo: document.getElementById('closeVersionInfo'),
+    versionInfoModal: document.getElementById('versionInfoModal'),
+    avatarInput: document.getElementById('avatarInput'),
+    profileAvatar: document.getElementById('profileAvatar'),
+    modalVersion: document.getElementById('modalVersion'),
+    modalChangelog: document.getElementById('modalChangelog')
+  };
+
+  const imagekit = new ImageKit({
+    publicKey: "public_ySA/zrQV3jHz1T9KiHuJh0fggbw=",
+    urlEndpoint: "https://ik.imagekit.io/focustimerin",
+    authenticationEndpoint: "/auth/imagekit"
+  });
+
+  const defaultAvatarSvg = '<svg width="60" height="60" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#fff"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" fill="#fff"/></svg>';
+
+  function generateImageURL(path, options = {}) {
+    return imagekit.url({
+      path,
+      transformation: [{
+        height: options.height || "300",
+        width: options.width || "300",
+        crop: options.crop || "at_max"
+      }]
     });
+  }
 
-    // URL generation helper function
-    function generateImageURL(path, options = {}) {
-      return imagekit.url({
-        path: path,
-        transformation: [{
-          height: options.height || "300",
-          width: options.width || "300",
-          crop: options.crop || "at_max"
-        }]
-      });
+  function updateAvatarDisplay(photoURL) {
+    if (!elements.profileAvatar) {
+      return;
     }
 
-    // Handle Avatar Upload
-    avatarInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    if (!photoURL) {
+      elements.profileAvatar.innerHTML = defaultAvatarSvg;
+      return;
+    }
 
-      if (!file.type.startsWith('image/')) {
-        alert('Mohon pilih file gambar');
+    const cacheBustedUrl = `${photoURL}?t=${Date.now()}`;
+    const img = new Image();
+    img.onload = () => {
+      elements.profileAvatar.innerHTML = `<img src="${cacheBustedUrl}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;">`;
+    };
+    img.onerror = () => {
+      console.error('Failed to load image:', photoURL);
+      elements.profileAvatar.innerHTML = defaultAvatarSvg;
+    };
+    img.src = cacheBustedUrl;
+  }
+
+  async function handleAvatarUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      alert('Mohon pilih file gambar');
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Silakan login terlebih dahulu.');
+      return;
+    }
+
+    try {
+      const uploadResponse = await imagekit.upload({
+        file,
+        fileName: `avatar_${user.uid}`,
+        folder: '/avatars'
+      });
+
+      const photoURL = generateImageURL(uploadResponse.filePath, {
+        height: '300',
+        width: '300',
+        crop: 'at_max'
+      });
+
+      await updateProfile(user, { photoURL });
+      await auth.currentUser?.reload();
+
+      updateAvatarDisplay(photoURL);
+      if (elements.editActions) {
+        elements.editActions.style.display = 'none';
+      }
+
+      alert('Foto profil berhasil diperbarui!');
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      alert('Gagal memperbarui foto profil: ' + error.message);
+    }
+  }
+
+  function setBodyTheme(theme) {
+    const body = document.body;
+    if (theme === 'light') {
+      body.classList.add('light-mode');
+      body.classList.remove('dark-mode');
+    } else {
+      body.classList.add('dark-mode');
+      body.classList.remove('light-mode');
+    }
+
+    const settings = JSON.parse(localStorage.getItem('focusTimerSettings')) || {};
+    settings.theme = theme;
+    localStorage.setItem('focusTimerSettings', JSON.stringify(settings));
+  }
+
+  function toggleBodyTheme() {
+    const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+    setBodyTheme(nextTheme);
+  }
+
+  if (elements.avatarInput) {
+    elements.avatarInput.addEventListener('change', handleAvatarUpload);
+  }
+
+  if (elements.editPhotoBtn && elements.avatarInput) {
+    elements.editPhotoBtn.addEventListener('click', () => {
+      elements.avatarInput?.click();
+      if (elements.editActions) {
+        elements.editActions.style.display = 'none';
+      }
+    });
+  }
+
+  if (elements.backBtn) {
+    elements.backBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.history.back();
+    });
+  }
+
+  if (elements.editDropdownBtn && elements.editActions) {
+    elements.editDropdownBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const isVisible = elements.editActions.style.display === 'flex';
+      elements.editActions.style.display = isVisible ? 'none' : 'flex';
+    });
+
+    document.addEventListener('click', (event) => {
+      if (
+        elements.editActions &&
+        elements.editActions.style.display === 'flex' &&
+        !elements.editActions.contains(event.target) &&
+        event.target !== elements.editDropdownBtn
+      ) {
+        elements.editActions.style.display = 'none';
+      }
+    });
+  }
+
+  if (elements.editNameBtn) {
+    elements.editNameBtn.addEventListener('click', async () => {
+      const newName = prompt('Nama baru:');
+      const user = auth.currentUser;
+
+      if (!user || !newName) {
         return;
       }
 
-      const user = auth.currentUser;
-      if (!user) return;      try {
-        // Upload to ImageKit
-        const uploadResponse = await imagekit.upload({
-          file: file,
-          fileName: `avatar_${user.uid}`,
-          folder: "/avatars"
-        });
-        
-        console.log('Upload complete:', uploadResponse);
-        
-        // Generate optimized URL using our helper function
-        const photoURL = generateImageURL(uploadResponse.filePath, {
-          height: "300",
-          width: "300",
-          crop: "at_max"
-        });
-        console.log('ImageKit URL:', photoURL);
-        
-        // Update user profile
-        await updateProfile(user, { photoURL });
-        console.log('Profile updated');
-        
-        // Force reload the user to get the latest photoURL
-        await auth.currentUser.reload();
-        const updatedUser = auth.currentUser;
-        console.log('User reloaded, new photoURL:', updatedUser.photoURL);
-        
-        // Update avatar display with the new URL
-        updateAvatarDisplay(photoURL);
-        
-        // Hide edit dropdown
-        editActions.style.display = 'none';
-        
-        alert('Foto profil berhasil diperbarui!');
+      try {
+        await updateProfile(user, { displayName: newName });
+        if (elements.nameSpan) {
+          elements.nameSpan.textContent = newName;
+        }
+        alert('Nama berhasil diubah!');
       } catch (error) {
-        console.error('Error uploading avatar:', error);
-        alert('Gagal memperbarui foto profil: ' + error.message);
+        alert('Gagal mengubah nama: ' + error.message);
+      } finally {
+        if (elements.editActions) {
+          elements.editActions.style.display = 'none';
+        }
       }
     });
+  }
 
-    // When Edit Photo is clicked, trigger the file input
-    editPhotoBtn.onclick = () => avatarInput.click();    // When avatar is updated, always show the latest photo (force reload by changing src)    function updateAvatarDisplay(photoURL) {
-      if (photoURL) {
-        const img = new Image();
-        img.onload = () => {
-          profileAvatar.innerHTML = `<img src="${photoURL}?t=${Date.now()}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;">`;
-        };
-        img.onerror = () => {
-          console.error('Failed to load image:', photoURL);
-          profileAvatar.innerHTML = `<svg width="60" height="60" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#fff"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" fill="#fff"/></svg>`;
-        };
-        img.src = photoURL + '?t=' + Date.now();
-      } else {
-        profileAvatar.innerHTML = `<svg width="60" height="60" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#fff"/><path d="M4 20c0-2.2 3.6-4 8-4s8 1.8 8 4" fill="#fff"/></svg>`;
-      }
-    }
-    // Auth State Change Handler
-    onAuthStateChanged(auth, user => {
+  if (elements.editEmailBtn) {
+    elements.editEmailBtn.addEventListener('click', async () => {
+      const user = auth.currentUser;
       if (!user) {
-        emailSpan.textContent = '-';
-        nameSpan.textContent = '-';        updateAvatarDisplay(null);
-        joinedSpan.textContent = '-';
-        totalFocusSpan.textContent = '0';
-        logoutBtn.style.display = 'none';
-        loginBtn.style.display = 'block';
-        changePasswordBtn.disabled = true;
-        editEmailBtn.style.display = 'none';
-      } else {
-        emailSpan.textContent = user.email || 'guest';
-        updateAvatarDisplay(user.photoURL);
-        nameSpan.textContent = user.displayName || '-';
-        joinedSpan.textContent = user.metadata?.creationTime 
-          ? new Date(user.metadata.creationTime).toLocaleDateString('id-ID')
-          : '-';
-        
-        const key = 'focusHistory_' + (user.email || '').replace(/[^\w]/g, '');
-        const focusHistory = JSON.parse(localStorage.getItem(key) || '[]');
-        const totalMinutes = focusHistory.reduce((sum, item) => sum + (parseInt(item.duration) || 0), 0);
-        totalFocusSpan.textContent = totalMinutes;
-        
-        logoutBtn.style.display = 'block';
-        loginBtn.style.display = 'none';
+        alert('Silakan login terlebih dahulu.');
+        return;
+      }
 
-        const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
-        if ((!user.email || user.email === 'guest') && isGoogleUser) {
-          editEmailBtn.style.display = 'inline-block';
-        } else {
-          editEmailBtn.style.display = 'none';
+      const newEmail = prompt('Masukkan email baru:');
+      if (!newEmail) {
+        return;
+      }
+
+      try {
+        await user.updateEmail(newEmail);
+        if (elements.emailSpan) {
+          elements.emailSpan.textContent = newEmail;
         }
-
-        if (isGoogleUser) {
-          changePasswordBtn.disabled = true;
-          changePasswordBtn.textContent = 'Ganti Password (hanya email/password)';
-        } else {
-          changePasswordBtn.disabled = false;
-          changePasswordBtn.textContent = 'Ganti Password';
+        alert('Email berhasil diubah!');
+      } catch (error) {
+        alert('Gagal mengubah email: ' + error.message);
+      } finally {
+        if (elements.editActions) {
+          elements.editActions.style.display = 'none';
         }
-      }    });
-
-    // Utility function to safely get DOM elements
-    function safeGet(id) {
-      return document.getElementById(id);
-    }
-
-    // Initialize button handlers
-    setTimeout(() => {
-      // Back button
-      const backBtn = safeGet('backBtn');
-  if (backBtn) {
-    backBtn.onclick = (e) => {
-      e.preventDefault();
-      window.history.back();
-    };
-  }
-
-  // Edit dropdown
-  const editDropdownBtn = safeGet('editDropdownBtn');
-  const editActions = safeGet('editActions');
-  if (editDropdownBtn && editActions) {
-    editDropdownBtn.onclick = (e) => {
-      e.stopPropagation();
-      editActions.style.display = (editActions.style.display === 'flex') ? 'none' : 'flex';
-    };
-    document.addEventListener('click', (e) => {
-      if (editActions.style.display === 'flex' &&
-          !editActions.contains(e.target) &&
-          e.target !== editDropdownBtn) {
-        editActions.style.display = 'none';
       }
     });
   }
 
-  // Edit actions
-  const editNameBtn = safeGet('editNameBtn');
-  const editEmailBtn = safeGet('editEmailBtn');
-  const editPhotoBtn = safeGet('editPhotoBtn');
-  const avatarInput = safeGet('avatarInput');
-  if (editNameBtn) {
-    editNameBtn.onclick = async () => {
-      const newName = prompt('Nama baru:');
+  if (elements.changePasswordBtn) {
+    elements.changePasswordBtn.addEventListener('click', async () => {
       const user = auth.currentUser;
-      if (user && newName) {
-        try {
-          await updateProfile(user, { displayName: newName });
-          nameSpan.textContent = newName;
-          alert('Nama berhasil diubah!');
-        } catch (err) {
-          alert('Gagal mengubah nama: ' + err.message);
-        }
+      if (!user?.email || elements.changePasswordBtn?.disabled) {
+        alert('Tidak dapat mengganti password untuk akun ini.');
+        return;
       }
-      if (editActions) editActions.style.display = 'none';
-    };
-  }
-  if (editEmailBtn) {
-    editEmailBtn.onclick = () => {
-      const user = auth.currentUser;
-      if (user) {
-        const newEmail = prompt('Masukkan email baru:');
-        if (newEmail) {
-          user.updateEmail(newEmail)
-            .then(() => {
-              emailSpan.textContent = newEmail;
-              alert('Email berhasil diubah!');
-            })
-            .catch(err => alert('Gagal mengubah email: ' + err.message));
-        }
+
+      try {
+        await sendPasswordResetEmail(auth, user.email);
+        alert('Link reset password telah dikirim ke email Anda.');
+      } catch (error) {
+        alert('Gagal mengirim email reset: ' + error.message);
       }
-      if (editActions) editActions.style.display = 'none';
-    };
-  }
-  if (editPhotoBtn && avatarInput) {
-    editPhotoBtn.onclick = () => avatarInput.click();
+    });
   }
 
-  // Action buttons
-  const changePasswordBtn = safeGet('changePasswordBtn');
-  if (changePasswordBtn) {
-    changePasswordBtn.onclick = () => {
-      const user = auth.currentUser;
-      if (user?.email && !changePasswordBtn.disabled) {
-        sendPasswordResetEmail(auth, user.email)
-          .then(() => alert('Link reset password telah dikirim ke email Anda.'))
-          .catch(err => alert('Gagal mengirim email reset: ' + err.message));
+  if (elements.toggleThemeBtn) {
+    elements.toggleThemeBtn.addEventListener('click', toggleBodyTheme);
+  }
+
+  if (elements.logoutBtn) {
+    elements.logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.reload();
+      } catch (error) {
+        alert('Gagal logout: ' + error.message);
       }
-    };
+    });
   }
-  const toggleThemeBtn = safeGet('toggleThemeBtn');
-  if (toggleThemeBtn) {
-    toggleThemeBtn.onclick = () => {
-      document.body.classList.toggle('dark-mode');
-      document.body.classList.toggle('light-mode');
-      const settings = JSON.parse(localStorage.getItem('focusTimerSettings')) || {
-        theme: document.body.classList.contains('light-mode') ? 'light' : 'dark'
-      };
-      settings.theme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
-      localStorage.setItem('focusTimerSettings', JSON.stringify(settings));
-    };
+
+  if (elements.loginBtn) {
+    elements.loginBtn.addEventListener('click', () => {
+      window.location.href = 'login.html';
+    });
   }
-  const logoutBtn = safeGet('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.onclick = () => signOut(auth).then(() => window.location.reload());
-  }
-  const loginBtn = safeGet('loginBtn');
-  if (loginBtn) {
-    loginBtn.onclick = () => window.location.href = 'login.html';
-  }
-  // Version Info Modal
-  const versionInfoBtn = safeGet('versionInfoBtn');
-  const versionInfoModal = safeGet('versionInfoModal');
-  const closeVersionInfo = safeGet('closeVersionInfo');
-  if (versionInfoBtn && versionInfoModal && closeVersionInfo) {
-    versionInfoBtn.onclick = () => {
+
+  if (elements.versionInfoBtn && elements.versionInfoModal && elements.closeVersionInfo) {
+    elements.versionInfoBtn.addEventListener('click', () => {
       const versionHistory = JSON.parse(localStorage.getItem('focusTimerVersionHistory') || '[]');
       const currentVersion = localStorage.getItem('focusTimerVersion') || '1.2.0';
-      let versionHtml = `<div style=\"text-align:left;\"><h3 style=\"margin-bottom:1rem;\">Versi Terkini: ${currentVersion}</h3>`;
-      versionHistory.slice(0, 4).forEach(ver => {
-        versionHtml += `\n          <div style=\"margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #444;\">\n            <b>v${ver.version}</b> (${ver.date})<br>\n            <div style=\"margin:0.5rem 0;white-space:pre-line;\">${ver.changelog}</div>\n          </div>`;
+
+      let versionHtml = `<div style="text-align:left;"><h3 style="margin-bottom:1rem;">Versi Terkini: ${currentVersion}</h3>`;
+      versionHistory.slice(0, 4).forEach((version) => {
+        versionHtml += `
+          <div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #444;">
+            <b>v${version.version}</b> (${version.date})<br>
+            <div style="margin:0.5rem 0;white-space:pre-line;">${version.changelog}</div>
+          </div>`;
       });
       versionHtml += '</div>';
-      safeGet('modalVersion').textContent = currentVersion;
-      safeGet('modalChangelog').innerHTML = versionHtml;
-      versionInfoModal.style.display = 'flex';
-    };
-    closeVersionInfo.onclick = () => versionInfoModal.style.display = 'none';
-    versionInfoModal.addEventListener('click', (e) => {
-      if (e.target === versionInfoModal) versionInfoModal.style.display = 'none';
+
+      if (elements.modalVersion) {
+        elements.modalVersion.textContent = currentVersion;
+      }
+      if (elements.modalChangelog) {
+        elements.modalChangelog.innerHTML = versionHtml;
+      }
+
+      elements.versionInfoModal.style.display = 'flex';
+    });
+
+    elements.closeVersionInfo.addEventListener('click', () => {
+      elements.versionInfoModal.style.display = 'none';
+    });
+
+    elements.versionInfoModal.addEventListener('click', (event) => {
+      if (event.target === elements.versionInfoModal) {
+        elements.versionInfoModal.style.display = 'none';
+      }
     });
   }
-}, 0);
-    // --- END BUTTON EVENT HANDLERS FINAL FIX ---
-  </script>
+
+  const savedSettings = JSON.parse(localStorage.getItem('focusTimerSettings') || '{}');
+  setBodyTheme(savedSettings.theme === 'light' ? 'light' : 'dark');
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      if (elements.emailSpan) {
+        elements.emailSpan.textContent = '-';
+      }
+      if (elements.nameSpan) {
+        elements.nameSpan.textContent = '-';
+      }
+      updateAvatarDisplay(null);
+      if (elements.joinedSpan) {
+        elements.joinedSpan.textContent = '-';
+      }
+      if (elements.totalFocusSpan) {
+        elements.totalFocusSpan.textContent = '0';
+      }
+      if (elements.logoutBtn) {
+        elements.logoutBtn.style.display = 'none';
+      }
+      if (elements.loginBtn) {
+        elements.loginBtn.style.display = 'block';
+      }
+      if (elements.changePasswordBtn) {
+        elements.changePasswordBtn.disabled = true;
+      }
+      if (elements.editEmailBtn) {
+        elements.editEmailBtn.style.display = 'none';
+      }
+      return;
+    }
+
+    if (elements.emailSpan) {
+      elements.emailSpan.textContent = user.email || 'guest';
+    }
+    updateAvatarDisplay(user.photoURL);
+    if (elements.nameSpan) {
+      elements.nameSpan.textContent = user.displayName || '-';
+    }
+    if (elements.joinedSpan) {
+      elements.joinedSpan.textContent = user.metadata?.creationTime
+        ? new Date(user.metadata.creationTime).toLocaleDateString('id-ID')
+        : '-';
+    }
+
+    const key = 'focusHistory_' + (user.email || '').replace(/[^\w]/g, '');
+    const focusHistory = JSON.parse(localStorage.getItem(key) || '[]');
+    const totalMinutes = focusHistory.reduce((sum, item) => sum + (parseInt(item.duration, 10) || 0), 0);
+    if (elements.totalFocusSpan) {
+      elements.totalFocusSpan.textContent = totalMinutes;
+    }
+
+    if (elements.logoutBtn) {
+      elements.logoutBtn.style.display = 'block';
+    }
+    if (elements.loginBtn) {
+      elements.loginBtn.style.display = 'none';
+    }
+
+    const providerData = Array.isArray(user.providerData) ? user.providerData : [];
+    const isGoogleUser = providerData.some((provider) => provider.providerId === 'google.com');
+
+    if (elements.editEmailBtn) {
+      if ((!user.email || user.email === 'guest') && isGoogleUser) {
+        elements.editEmailBtn.style.display = 'inline-block';
+      } else {
+        elements.editEmailBtn.style.display = 'none';
+      }
+    }
+
+    if (elements.changePasswordBtn) {
+      if (isGoogleUser) {
+        elements.changePasswordBtn.disabled = true;
+        elements.changePasswordBtn.textContent = 'Ganti Password (hanya email/password)';
+      } else {
+        elements.changePasswordBtn.disabled = false;
+        elements.changePasswordBtn.textContent = 'Ganti Password';
+      }
+    }
+  });
+</script>
+
 
   <!-- Chatbase AI Integration -->
   <script>
